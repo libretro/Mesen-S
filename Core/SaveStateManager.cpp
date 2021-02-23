@@ -66,7 +66,10 @@ void SaveStateManager::GetSaveStateHeader(ostream &stream)
 	stream.write((char*)&emuVersion, sizeof(emuVersion));
 	stream.write((char*)&formatVersion, sizeof(uint32_t));
 
-	string sha1Hash = _console->GetCartridge()->GetSha1Hash();
+	// Implementation of sha1hash is really sucky (lots of string/array copies)
+	// The sha1 isn't even checked at load time...
+	//string sha1Hash = _console->GetCartridge()->GetSha1Hash();
+	string sha1Hash(40, 'X'); // Fill a dummy pattern to keep save compatibilities
 	stream.write(sha1Hash.c_str(), sha1Hash.size());
 
 	bool isGameboyMode = _console->GetSettings()->CheckFlag(EmulationFlags::GameboyMode);
