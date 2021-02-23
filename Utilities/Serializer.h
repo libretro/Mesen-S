@@ -68,7 +68,7 @@ public:
 	template<typename T> void StreamArray(T *array, uint32_t size);
 	template<typename T> void StreamVector(vector<T> &list);
 
-	void Save(ostream &file, int compressionLevel = 1);
+	void Save(ostream &file, int compressionLevel = 0);
 
 	void Stream(ISerializable &obj);
 	void Stream(ISerializable *obj);
