@@ -59,7 +59,7 @@ private:
 
 public:
 	Serializer(uint32_t version);
-	Serializer(istream &file, uint32_t version, bool compressed = true);
+	Serializer(istream &file, uint32_t version, bool compressed = false);
 
 	uint32_t GetVersion() { return _version; }
 	bool IsSaving() { return _saving; }

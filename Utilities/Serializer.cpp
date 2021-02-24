@@ -37,9 +37,15 @@ Serializer::Serializer(istream &file, uint32_t version, bool compressed)
 		unsigned long decompSize = decompressedSize;
 		uncompress(_block->Data.data(), &decompSize, compressedData.data(), (unsigned long)compressedData.size());
 	} else {
+		// Start of the file contains an header that shouldn't be
+		// part of the stream
+		uint32_t current = (uint32_t)file.tellg();
+
 		file.seekg(0, std::ios::end);
 		uint32_t size = (uint32_t)file.tellg();
-		file.seekg(0, std::ios::beg);
+
+		file.seekg(current, std::ios::beg);
+		size -= current;
 
 		_block->Data = vector<uint8_t>(size, 0);
 		file.read((char*)_block->Data.data(), size);

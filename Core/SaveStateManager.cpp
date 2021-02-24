@@ -223,7 +223,8 @@ bool SaveStateManager::LoadState(istream &stream, bool hashCheckRequired)
 		//(Note: Loading a state is disabled in the UI while a movie is playing/recording)
 		_console->GetMovieManager()->Stop();
 
-		_console->Deserialize(stream, fileFormatVersion);
+		bool is_compressed = fileFormatVersion <= 8;
+		_console->Deserialize(stream, fileFormatVersion, is_compressed);
 
 		return true;
 	}
