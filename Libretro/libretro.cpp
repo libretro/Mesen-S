@@ -53,6 +53,7 @@ static constexpr const char* MesenOverclockType = "mesen-s_overclock_type";
 static constexpr const char* MesenSuperFxOverclock = "mesen-s_superfx_overclock";
 static constexpr const char* MesenGbModel = "mesen-s_gbmodel";
 static constexpr const char* MesenGbSgb2 = "mesen-s_sgb2";
+static constexpr const char* MesenHLE = "mesen-s_hle_coprocessor";
 
 extern "C" {
 	void logMessage(retro_log_level level, const char* message)
@@ -126,6 +127,7 @@ extern "C" {
 			{ MesenOverclockType, "Overclock Type; Before NMI|After NMI" },
 			{ MesenSuperFxOverclock, "Super FX Clock Speed; 100%|200%|300%|400%|500%|1000%" },
 			{ MesenRamState, "Default power-on state for RAM; Random Values (Default)|All 0s|All 1s" },
+			{ MesenHLE, "Use HLE coprocessor emulation; disabled|enabled" },
 			{ NULL, NULL },
 		};
 
@@ -385,11 +387,16 @@ extern "C" {
 			}
 		}
 
+		if(readVariable(MesenHLE, var)) {
+			string value = string(var.value);
+			emulation.EnableHleCoprocessor = (value == "enabled");
+		}
+
 		if(readVariable(MesenBlendHighRes, var)) {
 			string value = string(var.value);
 			video.BlendHighResolutionModes = (value == "enabled");
 		}
-		
+
 		if(readVariable(MesenCubicInterpolation, var)) {
 			string value = string(var.value);
 			audio.EnableCubicInterpolation = (value == "enabled");
