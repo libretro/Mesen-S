@@ -139,18 +139,5 @@ void NecDspHle::Serialize(Serializer &s)
 	if (_type == CoprocessorType::DSP1 || _type == CoprocessorType::DSP1B) {
 		_dsp1.Serialize(s);
 	}
-
-#if 0
-	s.Stream(
-		_state.A, _state.B, _state.DP, _state.DR, _state.K, _state.L, _state.M, _state.N, _state.PC,
-		_state.RP, _state.SerialIn, _state.SerialOut, _state.SP, _state.SR, _state.TR, _state.TRB, 
-		_state.FlagsA.Carry, _state.FlagsA.Overflow0, _state.FlagsA.Overflow1, _state.FlagsA.Sign0, _state.FlagsA.Sign1, _state.FlagsA.Zero,
-		_state.FlagsB.Carry, _state.FlagsB.Overflow0, _state.FlagsB.Overflow1, _state.FlagsB.Sign0, _state.FlagsB.Sign1, _state.FlagsB.Zero
-	);
-
-	s.Stream(_opCode, _cycleCount, _inRqmLoop);
-	s.StreamArray<uint16_t>(_ram, _ramSize);
-	s.StreamArray<uint16_t>(_stack, _stackSize);
-#endif
 }
 
