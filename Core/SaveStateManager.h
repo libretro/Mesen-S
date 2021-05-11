@@ -16,7 +16,6 @@ private:
 	bool GetScreenshotData(vector<uint8_t>& out, uint32_t& width, uint32_t& height, istream& stream);
 
 public:
-	// Piepacker: remove compression
 	static constexpr uint32_t FileFormatVersion = 9;
 
 	SaveStateManager(shared_ptr<Console> console);
