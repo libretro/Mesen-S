@@ -139,8 +139,8 @@ public:
 	void Unlock();
 	bool IsThreadPaused();
 
-	void Serialize(ostream &out, int compressionLevel = 1);
-	void Deserialize(istream &in, uint32_t fileFormatVersion, bool compressed = true);
+	void Serialize(ostream &out, int compressionLevel = 0);
+	void Deserialize(istream &in, uint32_t fileFormatVersion, bool compressed = false);
 
 	shared_ptr<SoundMixer> GetSoundMixer();
 	shared_ptr<VideoRenderer> GetVideoRenderer();

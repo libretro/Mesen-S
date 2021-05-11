@@ -11,6 +11,7 @@
 #include "SettingTypes.h"
 #include "BatteryManager.h"
 #include "NecDsp.h"
+#include "NecDspHle.h"
 #include "Sa1.h"
 #include "Gsu.h"
 #include "Sdd1.h"
@@ -500,8 +501,11 @@ void BaseCartridge::LoadEmbeddedFirmware()
 
 void BaseCartridge::InitCoprocessor()
 {
-	_coprocessor.reset(NecDsp::InitCoprocessor(_coprocessorType, _console, _embeddedFirmware));
-	_necDsp = dynamic_cast<NecDsp*>(_coprocessor.get());
+	bool hle = _console->GetSettings()->GetEmulationConfig().EnableHleCoprocessor;
+	if (!hle) {
+		_coprocessor.reset(NecDsp::InitCoprocessor(_coprocessorType, _console, _embeddedFirmware));
+		_necDsp = dynamic_cast<NecDsp*>(_coprocessor.get());
+	}
 
 	if(_coprocessorType == CoprocessorType::SA1) {
 		_coprocessor.reset(new Sa1(_console));
@@ -537,6 +541,9 @@ void BaseCartridge::InitCoprocessor()
 		_coprocessor.reset(new SuperGameboy(_console));
 		_sgb = dynamic_cast<SuperGameboy*>(_coprocessor.get());
 		_needCoprocSync = true;
+	} else if (hle) {
+		printf("USE HLE DSP1\n");
+		_coprocessor.reset(NecDspHle::InitCoprocessor(_coprocessorType, _console));
 	}
 }
 

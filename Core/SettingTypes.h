@@ -305,6 +305,8 @@ struct EmulationConfig
 	RamState RamPowerOnState = RamState::Random;
 
 	int64_t BsxCustomDate = -1;
+
+	bool EnableHleCoprocessor = false;
 };
 
 struct GameboyConfig
