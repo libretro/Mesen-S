@@ -520,7 +520,31 @@ extern "C" {
 	RETRO_API void retro_cheat_set(unsigned index, bool enabled, const char *codeStr)
 	{
 		if(codeStr) {
-			_console->GetCheatManager()->AddStringCheat(codeStr);
+			int chl = 0;
+			string code = codeStr;
+			if(code[4] == '-') {
+				for(;;) {
+					string code1 = code.substr((0 + chl), 9);
+					_console->GetCheatManager()->AddStringCheat(code1);
+					if(code[(9 + chl)] != '+') {
+						return;
+					}
+					chl = (chl + 10);
+				}
+			}
+			else if(code[8] == '+') {
+				for(;;) {
+					string code1 = code.substr((0 + chl), 8);
+					_console->GetCheatManager()->AddStringCheat(code1);
+					if(code[(8 + chl)] != '+') {
+						return;
+					}
+					chl = (chl + 9);
+				}
+			}
+			else {
+				_console->GetCheatManager()->AddStringCheat(code);
+			}
 		}
 	}
 
