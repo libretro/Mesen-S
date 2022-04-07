@@ -56,7 +56,6 @@ private:
 	uint32_t _saveRamSize = 0;
 	uint32_t _coprocessorRamSize = 0;
 	
-	shared_ptr<SpcFileData> _spcData;
 	vector<uint8_t> _embeddedFirmware;
 
 	void LoadBattery();
@@ -129,8 +128,6 @@ public:
 
 	vector<unique_ptr<IMemoryHandler>>& GetPrgRomHandlers();
 	vector<unique_ptr<IMemoryHandler>>& GetSaveRamHandlers();
-
-	SpcFileData* GetSpcData();
 
 	void Serialize(Serializer &s) override;
 };

@@ -68,7 +68,6 @@ private:
 	shared_ptr<RewindManager> _rewindManager;
 	shared_ptr<CheatManager> _cheatManager;
 	shared_ptr<MovieManager> _movieManager;
-	shared_ptr<SpcHud> _spcHud;
 
 	atomic<uint32_t> _lockCounter;
 	SimpleLock _runLock;

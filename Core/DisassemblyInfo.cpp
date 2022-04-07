@@ -5,7 +5,6 @@
 #include "EmuSettings.h"
 #include "MemoryDumper.h"
 #include "CpuDisUtils.h"
-#include "SpcDisUtils.h"
 #include "GsuDisUtils.h"
 #include "NecDspDisUtils.h"
 #include "Cx4DisUtils.h"
@@ -73,7 +72,7 @@ void DisassemblyInfo::GetDisassembly(string &out, uint32_t memoryAddr, LabelMana
 			CpuDisUtils::GetDisassembly(*this, out, memoryAddr, labelManager, settings);
 			break;
 
-		case CpuType::Spc: SpcDisUtils::GetDisassembly(*this, out, memoryAddr, labelManager, settings); break;
+		case CpuType::Spc: break;
 		case CpuType::NecDsp: NecDspDisUtils::GetDisassembly(*this, out, memoryAddr, labelManager, settings); break;
 		case CpuType::Gsu: GsuDisUtils::GetDisassembly(*this, out, memoryAddr, labelManager, settings); break;
 		case CpuType::Cx4: Cx4DisUtils::GetDisassembly(*this, out, memoryAddr, labelManager, settings); break;
@@ -88,7 +87,7 @@ int32_t DisassemblyInfo::GetEffectiveAddress(Console *console, void *cpuState, C
 		case CpuType::Cpu:
 			return CpuDisUtils::GetEffectiveAddress(*this, console, *(CpuState*)cpuState, cpuType);
 
-		case CpuType::Spc: return SpcDisUtils::GetEffectiveAddress(*this, console, *(SpcState*)cpuState);
+		case CpuType::Spc: break;
 		case CpuType::Gsu: return GsuDisUtils::GetEffectiveAddress(*this, console, *(GsuState*)cpuState);
 
 		case CpuType::Cx4:
@@ -149,7 +148,7 @@ uint8_t DisassemblyInfo::GetOpSize(uint8_t opCode, uint8_t flags, CpuType type)
 		case CpuType::Cpu: 
 			return CpuDisUtils::GetOpSize(opCode, flags);
 
-		case CpuType::Spc: return SpcDisUtils::GetOpSize(opCode);
+		case CpuType::Spc: break;
 		
 		case CpuType::Gsu: 
 			if(opCode >= 0x05 && opCode <= 0x0F) {

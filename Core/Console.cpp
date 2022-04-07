@@ -34,7 +34,6 @@
 #include "CheatManager.h"
 #include "MovieManager.h"
 #include "SystemActionManager.h"
-#include "SpcHud.h"
 #include "Msu1.h"
 #include "../Utilities/Serializer.h"
 #include "../Utilities/Timer.h"
@@ -220,13 +219,6 @@ void Console::Reset()
 	_notificationManager->SendNotification(ConsoleNotificationType::GameReset);
 	ProcessEvent(EventType::Reset);
 
-	if(_cart->GetSpcData()) {
-		_spc->LoadSpcFile(_cart->GetSpcData());
-		_spcHud.reset(new SpcHud(this, _cart->GetSpcData()));
-	} else {
-		_spcHud.reset();
-	}
-
 	if(debugger) {
 		//Debugger was suspended in SystemActionManager::Reset(), resume debugger here
 		debugger->SuspendDebugger(true);
@@ -297,13 +289,6 @@ bool Console::LoadRom(VirtualFile romFile, VirtualFile patchFile, bool stopRom, 
 		_spc.reset(new Spc(this));
 
 		_msu1.reset(Msu1::Init(romFile, _spc.get()));
-
-		if(_cart->GetSpcData()) {
-			_spc->LoadSpcFile(_cart->GetSpcData());
-			_spcHud.reset(new SpcHud(this, _cart->GetSpcData()));
-		} else {
-			_spcHud.reset();
-		}
 
 		_cpu.reset(new Cpu(this));
 		_memoryManager->Initialize(this);
@@ -776,10 +761,6 @@ void Console::ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool for
 
 void Console::ProcessEvent(EventType type)
 {
-	if(type == EventType::EndFrame && _spcHud) {
-		_spcHud->Draw(GetFrameCount());
-	}
-
 	if(_debugger) {
 		_debugger->ProcessEvent(type);
 	}

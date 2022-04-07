@@ -4,7 +4,6 @@
 #include "KeyManager.h"
 #include "MessageManager.h"
 #include "Console.h"
-#include "SpcDisUtils.h"
 #include "NotificationManager.h"
 #include "../Utilities/FolderUtilities.h"
 

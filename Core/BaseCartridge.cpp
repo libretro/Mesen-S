@@ -21,7 +21,6 @@
 #include "BsxCart.h"
 #include "BsxMemoryPack.h"
 #include "FirmwareHelper.h"
-#include "SpcFileData.h"
 #include "SuperGameboy.h"
 #include "Gameboy.h"
 #include "../Utilities/HexUtilities.h"
@@ -87,16 +86,7 @@ shared_ptr<BaseCartridge> BaseCartridge::CreateCartridge(Console* console, Virtu
 			memcpy(cart->_prgRom, romData.data(), romData.size());
 		}
 
-		if(memcmp(cart->_prgRom, "SNES-SPC700 Sound File Data", 27) == 0) {
-			if(cart->_prgRomSize >= 0x10200) {
-				//SPC files must be 0x10200 bytes long at minimum
-				cart->LoadSpc();
-			} else {
-				return nullptr;
-			}
-		} else {
-			cart->LoadRom();
-		}
+		cart->LoadRom();
 
 		return cart;
 	} else {
@@ -623,7 +613,6 @@ void BaseCartridge::ApplyConfigOverrides()
 
 void BaseCartridge::LoadSpc()
 {
-	_spcData.reset(new SpcFileData(_prgRom));
 	SetupCpuHalt();
 }
 
@@ -868,9 +857,4 @@ vector<unique_ptr<IMemoryHandler>>& BaseCartridge::GetPrgRomHandlers()
 vector<unique_ptr<IMemoryHandler>>& BaseCartridge::GetSaveRamHandlers()
 {
 	return _saveRamHandlers;
-}
-
-SpcFileData* BaseCartridge::GetSpcData()
-{
-	return _spcData.get();
 }
