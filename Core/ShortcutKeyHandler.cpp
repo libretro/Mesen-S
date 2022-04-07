@@ -9,7 +9,6 @@
 #include "NotificationManager.h"
 #include "SaveStateManager.h"
 #include "MovieManager.h"
-#include "GameClient.h"
 
 ShortcutKeyHandler::ShortcutKeyHandler(shared_ptr<Console> console)
 {
@@ -104,9 +103,6 @@ void ShortcutKeyHandler::ProcessRunSingleFrame()
 void ShortcutKeyHandler::CheckMappedKeys()
 {
 	shared_ptr<EmuSettings> settings = _console->GetSettings();
-	bool isNetplayClient = GameClient::Connected();
-	bool isMovieActive = _console->GetMovieManager()->Playing() || _console->GetMovieManager()->Recording();
-	bool isMovieRecording = _console->GetMovieManager()->Recording();
 
 	//Let the UI handle these shortcuts
 	for(uint64_t i = (uint64_t)EmulatorShortcut::TakeScreenshot; i < (uint64_t)EmulatorShortcut::ShortcutCount; i++) {
@@ -152,7 +148,7 @@ void ShortcutKeyHandler::CheckMappedKeys()
 		_console->GetSaveStateManager()->LoadState();
 	}
 
-	if(DetectKeyPress(EmulatorShortcut::ToggleCheats) && !isNetplayClient && !isMovieActive) {
+	if(DetectKeyPress(EmulatorShortcut::ToggleCheats)) {
 		_console->GetNotificationManager()->SendNotification(ConsoleNotificationType::ExecuteShortcut, (void*)EmulatorShortcut::ToggleCheats);
 	}
 
@@ -165,7 +161,7 @@ void ShortcutKeyHandler::CheckMappedKeys()
 		_repeatStarted = false;
 	}
 
-	if(!isNetplayClient && !isMovieRecording) {
+	{
 		shared_ptr<RewindManager> rewindManager = _console->GetRewindManager();
 		if(rewindManager) {
 			if(DetectKeyPress(EmulatorShortcut::ToggleRewind)) {

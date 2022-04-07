@@ -12,7 +12,6 @@
 #include "MovieManager.h"
 #include "EventType.h"
 #include "Debugger.h"
-#include "GameClient.h"
 #include "Ppu.h"
 #include "DefaultVideoFilter.h"
 
@@ -160,11 +159,6 @@ bool SaveStateManager::GetScreenshotData(vector<uint8_t>& out, uint32_t &width, 
 
 bool SaveStateManager::LoadState(istream &stream, bool hashCheckRequired)
 {
-	if(GameClient::Connected()) {
-		MessageManager::DisplayMessage("Netplay", "NetplayNotAllowed");
-		return false;
-	}
-
 	char header[3];
 	stream.read(header, 3);
 	if(memcmp(header, "MSS", 3) == 0) {
