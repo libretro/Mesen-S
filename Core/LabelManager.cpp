@@ -2,7 +2,6 @@
 #include "LabelManager.h"
 #include "Debugger.h"
 #include "DebugUtilities.h"
-#include "DebugBreakHelper.h"
 
 LabelManager::LabelManager(Debugger *debugger)
 {
@@ -11,14 +10,12 @@ LabelManager::LabelManager(Debugger *debugger)
 
 void LabelManager::ClearLabels()
 {
-	DebugBreakHelper helper(_debugger);
 	_codeLabels.clear();
 	_codeLabelReverseLookup.clear();
 }
 
 void LabelManager::SetLabel(uint32_t address, SnesMemoryType memType, string label, string comment)
 {
-	DebugBreakHelper helper(_debugger);
 	uint64_t key = GetLabelKey(address, memType);
 
 	auto existingLabel = _codeLabels.find(key);

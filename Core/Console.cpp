@@ -109,65 +109,6 @@ void Console::RunFrame()
 	}
 }
 
-void Console::Run()
-{
-	if(!_cpu) {
-		return;
-	}
-	
-	auto emulationLock = _emulationLock.AcquireSafe();
-	auto lock = _runLock.AcquireSafe();
-
-	_stopFlag = false;
-	_isRunAheadFrame = false;
-
-	PlatformUtilities::EnableHighResolutionTimer();
-
-	_videoDecoder->StartThread();
-	_emulationThreadId = std::this_thread::get_id();
-
-	_memoryManager->IncMasterClockStartup();
-	_controlManager->UpdateInputState();
-
-	_frameDelay = GetFrameDelay();
-	_stats.reset(new DebugStats());
-	_frameLimiter.reset(new FrameLimiter(_frameDelay));
-	_lastFrameTimer.Reset();
-
-	while(!_stopFlag) {
-		bool useRunAhead = _settings->GetEmulationConfig().RunAheadFrames > 0 && !_debugger && !_rewindManager->IsRewinding() && _settings->GetEmulationSpeed() > 0 && _settings->GetEmulationSpeed() <= 100;
-		if(useRunAhead) {
-			RunFrameWithRunAhead();
-		} else {
-			RunFrame();
-			_rewindManager->ProcessEndOfFrame();
-			ProcessSystemActions();
-		}
-
-		WaitForLock();
-
-		if(_pauseOnNextFrame) {
-			_pauseOnNextFrame = false;
-			_paused = true;
-		}
-
-		if(_paused && !_stopFlag && !_debugger) {
-			WaitForPauseEnd();
-		}		
-
-		if(_memoryManager->GetMasterClock() == 0) {
-			//After a reset or power cycle, run the PPU/etc ahead of the CPU (simulates delay CPU takes to get out of reset)
-			_memoryManager->IncMasterClockStartup();
-		}
-	}
-
-	_movieManager->Stop();
-
-	_emulationThreadId = thread::id();
-
-	PlatformUtilities::RestoreTimerResolution();
-}
-
 bool Console::ProcessSystemActions()
 {
 	if(_controlManager->GetSystemActionManager()->IsResetPressed()) {
@@ -180,78 +121,14 @@ bool Console::ProcessSystemActions()
 	return false;
 }
 
-void Console::RunFrameWithRunAhead()
-{
-	stringstream runAheadState;
-	uint32_t frameCount = _settings->GetEmulationConfig().RunAheadFrames;
-
-	//Run a single frame and save the state (no audio/video)
-	_isRunAheadFrame = true;
-	RunFrame();
-	Serialize(runAheadState, 0);
-
-	while(frameCount > 1) {
-		//Run extra frames if the requested run ahead frame count is higher than 1
-		frameCount--;
-		RunFrame();
-	}
-	_isRunAheadFrame = false;
-
-	//Run one frame normally (with audio/video output)
-	RunFrame();
-	_rewindManager->ProcessEndOfFrame();
-	
-	bool wasReset = ProcessSystemActions();
-	if(!wasReset) {
-		//Load the state we saved earlier
-		_isRunAheadFrame = true;
-		Deserialize(runAheadState, SaveStateManager::FileFormatVersion, false);
-		_isRunAheadFrame = false;
-	}
-}
-
 void Console::ProcessEndOfFrame()
 {
-#ifndef LIBRETRO
-	_cart->RunCoprocessors();
-	if(_cart->GetCoprocessor()) {
-		_cart->GetCoprocessor()->ProcessEndOfFrame();
-	}
-
-	if(!_isRunAheadFrame) {
-		_frameLimiter->ProcessFrame();
-		while(_frameLimiter->WaitForNextFrame()) {
-			if(_stopFlag || _frameDelay != GetFrameDelay() || _paused || _pauseOnNextFrame || _lockCounter > 0) {
-				//Need to process another event, stop sleeping
-				break;
-			}
-		}
-
-		double newFrameDelay = GetFrameDelay();
-		if(newFrameDelay != _frameDelay) {
-			_frameDelay = newFrameDelay;
-			_frameLimiter->SetDelay(_frameDelay);
-		}
-
-		PreferencesConfig cfg = _settings->GetPreferences();
-		if(cfg.ShowDebugInfo) {
-			double lastFrameTime = _lastFrameTimer.GetElapsedMS();
-			_lastFrameTimer.Reset();
-			_stats->DisplayStats(this, lastFrameTime);
-		}
-	}
-
-	_controlManager->UpdateInputState();
-	_controlManager->UpdateControlDevices();
-	_internalRegisters->ProcessAutoJoypadRead();
-#endif
 	_frameRunning = false;
 }
 
 void Console::RunSingleFrame()
 {
 	//Used by Libretro
-	_emulationThreadId = std::this_thread::get_id();
 	_isRunAheadFrame = false;
 
 	_controlManager->UpdateInputState();
@@ -865,11 +742,6 @@ void Console::StopDebugger()
 bool Console::IsDebugging()
 {
 	return _debugger != nullptr;
-}
-
-thread::id Console::GetEmulationThreadId()
-{
-	return _emulationThreadId;
 }
 
 bool Console::IsRunning()

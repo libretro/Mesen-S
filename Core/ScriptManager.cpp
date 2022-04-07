@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "ScriptManager.h"
 #include "ScriptHost.h"
-#include "DebugBreakHelper.h"
 #include "Debugger.h"
 #include "CpuTypes.h"
 #include "Console.h"
@@ -16,7 +15,6 @@ ScriptManager::ScriptManager(Debugger* debugger)
 
 int ScriptManager::LoadScript(string name, string content, int32_t scriptId)
 {
-	DebugBreakHelper helper(_debugger);
 	auto lock = _scriptLock.AcquireSafe();
 
 	if(scriptId < 0) {
@@ -43,7 +41,6 @@ int ScriptManager::LoadScript(string name, string content, int32_t scriptId)
 
 void ScriptManager::RemoveScript(int32_t scriptId)
 {
-	DebugBreakHelper helper(_debugger);
 	auto lock = _scriptLock.AcquireSafe();
 	_scripts.erase(std::remove_if(_scripts.begin(), _scripts.end(), [=](const shared_ptr<ScriptHost>& script) {
 		if(script->GetScriptId() == scriptId) {

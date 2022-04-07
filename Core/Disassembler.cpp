@@ -19,7 +19,6 @@
 #include "MemoryDumper.h"
 #include "Console.h"
 #include "CodeDataLogger.h"
-#include "DebugBreakHelper.h"
 #include "BaseCartridge.h"
 #include "EmuSettings.h"
 #include "DebugUtilities.h"
@@ -383,7 +382,6 @@ DisassemblyInfo Disassembler::GetDisassemblyInfo(AddressInfo &info, uint32_t cpu
 
 void Disassembler::RefreshDisassembly(CpuType type)
 {
-	DebugBreakHelper helper(_debugger);
 	_needDisassemble[(int)type] = true;
 	Disassemble(type);
 }

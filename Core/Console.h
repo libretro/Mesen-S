@@ -70,8 +70,6 @@ private:
 	shared_ptr<MovieManager> _movieManager;
 	shared_ptr<SpcHud> _spcHud;
 
-	thread::id _emulationThreadId;
-	
 	atomic<uint32_t> _lockCounter;
 	SimpleLock _runLock;
 	SimpleLock _emulationLock;
@@ -101,7 +99,6 @@ private:
 
 	void RunFrame();
 	bool ProcessSystemActions();
-	void RunFrameWithRunAhead();
 
 public:
 	Console();
@@ -111,7 +108,6 @@ public:
 	void Release();
 
 
-	void Run();
 	void RunSingleFrame();
 	void Stop(bool sendNotification);
 

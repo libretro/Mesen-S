@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "CallstackManager.h"
 #include "Debugger.h"
-#include "DebugBreakHelper.h"
 #include "Profiler.h"
 
 CallstackManager::CallstackManager(Debugger* debugger)
@@ -70,7 +69,6 @@ void CallstackManager::Pop(AddressInfo& dest, uint32_t destAddress)
 
 void CallstackManager::GetCallstack(StackFrameInfo* callstackArray, uint32_t &callstackSize)
 {
-	DebugBreakHelper helper(_debugger);
 	int i = 0;
 	for(StackFrameInfo &info : _callstack) {
 		callstackArray[i] = info;
@@ -81,7 +79,6 @@ void CallstackManager::GetCallstack(StackFrameInfo* callstackArray, uint32_t &ca
 
 int32_t CallstackManager::GetReturnAddress()
 {
-	DebugBreakHelper helper(_debugger);
 	if(_callstack.empty()) {
 		return -1;
 	}

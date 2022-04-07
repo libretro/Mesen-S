@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "MemoryAccessCounter.h"
 #include "MemoryManager.h"
-#include "DebugBreakHelper.h"
 #include "Debugger.h"
 #include "MemoryDumper.h"
 #include "Spc.h"
@@ -9,6 +8,7 @@
 #include "Gsu.h"
 #include "Cx4.h"
 #include "Gameboy.h"
+#include "Console.h"
 #include "BaseCartridge.h"
 
 MemoryAccessCounter::MemoryAccessCounter(Debugger* debugger, Console *console)
@@ -84,7 +84,6 @@ void MemoryAccessCounter::ProcessMemoryExec(AddressInfo& addressInfo, uint64_t m
 
 void MemoryAccessCounter::ResetCounts()
 {
-	DebugBreakHelper helper(_debugger);
 	for(int i = 0; i < (int)SnesMemoryType::Register; i++) {
 		for(uint32_t j = 0; j < _counters[i].size(); j++) {
 			_counters[i][j] = { j };

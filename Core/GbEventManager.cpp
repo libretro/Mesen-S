@@ -4,7 +4,6 @@
 #include "GbCpu.h"
 #include "GbPpu.h"
 #include "Debugger.h"
-#include "DebugBreakHelper.h"
 #include "DefaultVideoFilter.h"
 #include "Gameboy.h"
 #include "Console.h"
@@ -195,7 +194,6 @@ void GbEventManager::DrawEvent(DebugEventInfo& evt, bool drawBackground, uint32_
 
 uint32_t GbEventManager::TakeEventSnapshot(EventViewerDisplayOptions options)
 {
-	DebugBreakHelper breakHelper(_debugger);
 	auto lock = _lock.AcquireSafe();
 	_snapshot.clear();
 

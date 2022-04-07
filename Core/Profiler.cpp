@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include <limits>
 #include "Profiler.h"
-#include "DebugBreakHelper.h"
 #include "Debugger.h"
 #include "Console.h"
 #include "MemoryDumper.h"
@@ -87,7 +86,6 @@ void Profiler::UnstackFunction()
 
 void Profiler::Reset()
 {
-	DebugBreakHelper helper(_debugger);
 	InternalReset();
 }
 
@@ -107,7 +105,6 @@ void Profiler::InternalReset()
 
 void Profiler::GetProfilerData(ProfiledFunction* profilerData, uint32_t& functionCount)
 {
-	DebugBreakHelper helper(_debugger);
 	
 	UpdateCycles();
 

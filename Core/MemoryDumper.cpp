@@ -16,7 +16,6 @@
 #include "BaseCartridge.h"
 #include "VideoDecoder.h"
 #include "DebugTypes.h"
-#include "DebugBreakHelper.h"
 #include "Disassembler.h"
 
 MemoryDumper::MemoryDumper(Debugger* debugger)
@@ -176,7 +175,6 @@ void MemoryDumper::GetMemoryState(SnesMemoryType type, uint8_t *buffer)
 
 void MemoryDumper::SetMemoryValues(SnesMemoryType memoryType, uint32_t address, uint8_t* data, uint32_t length)
 {
-	DebugBreakHelper helper(_debugger);
 	for(uint32_t i = 0; i < length; i++) {
 		SetMemoryValue(memoryType, address+i, data[i], true);
 	}
@@ -250,7 +248,6 @@ uint16_t MemoryDumper::GetMemoryValueWord(SnesMemoryType memoryType, uint32_t ad
 
 void MemoryDumper::SetMemoryValueWord(SnesMemoryType memoryType, uint32_t address, uint16_t value, bool disableSideEffects)
 {
-	DebugBreakHelper helper(_debugger);
 	SetMemoryValue(memoryType, address, (uint8_t)value, disableSideEffects);
 	SetMemoryValue(memoryType, address + 1, (uint8_t)(value >> 8), disableSideEffects);
 }

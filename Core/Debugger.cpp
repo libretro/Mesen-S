@@ -34,7 +34,6 @@
 #include "EventManager.h"
 #include "GbEventManager.h"
 #include "EventType.h"
-#include "DebugBreakHelper.h"
 #include "LabelManager.h"
 #include "ScriptManager.h"
 #include "CallstackManager.h"
@@ -389,7 +388,6 @@ void Debugger::Run()
 
 void Debugger::Step(CpuType cpuType, int32_t stepCount, StepType type)
 {
-	DebugBreakHelper helper(this);
 	StepRequest step;
 	IDebugger *debugger = nullptr;
 
@@ -598,14 +596,12 @@ AddressInfo Debugger::GetRelativeAddress(AddressInfo absAddress, CpuType cpuType
 
 void Debugger::SetCdlData(CpuType cpuType, uint8_t *cdlData, uint32_t length)
 {
-	DebugBreakHelper helper(this);
 	GetCodeDataLogger(cpuType)->SetCdlData(cdlData, length);
 	RefreshCodeCache();
 }
 
 void Debugger::MarkBytesAs(CpuType cpuType, uint32_t start, uint32_t end, uint8_t flags)
 {
-	DebugBreakHelper helper(this);
 	GetCodeDataLogger(cpuType)->MarkBytesAs(start, end, flags);
 	RefreshCodeCache();
 }

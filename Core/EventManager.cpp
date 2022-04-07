@@ -6,7 +6,6 @@
 #include "DmaController.h"
 #include "MemoryManager.h"
 #include "Debugger.h"
-#include "DebugBreakHelper.h"
 #include "DefaultVideoFilter.h"
 #include "BaseEventManager.h"
 
@@ -237,7 +236,6 @@ void EventManager::DrawEvent(DebugEventInfo &evt, bool drawBackground, uint32_t 
 
 uint32_t EventManager::TakeEventSnapshot(EventViewerDisplayOptions options)
 {
-	DebugBreakHelper breakHelper(_debugger);
 	auto lock = _lock.AcquireSafe();
 	_snapshot.clear();
 
