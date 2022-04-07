@@ -156,7 +156,6 @@ SOURCES_CXX := $(LIBRETRO_DIR)/libretro.cpp \
                $(UTIL_DIR)/sha1.cpp \
                $(UTIL_DIR)/SimpleLock.cpp \
                $(UTIL_DIR)/snes_ntsc.cpp \
-               $(UTIL_DIR)/Socket.cpp \
                $(UTIL_DIR)/stb_vorbis.cpp \
                $(UTIL_DIR)/stdafx.cpp \
                $(UTIL_DIR)/SZReader.cpp \
