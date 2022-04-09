@@ -73,10 +73,8 @@ NecDspHle* NecDspHle::InitCoprocessor(CoprocessorType type, Console *console)
 
 void NecDspHle::Reset()
 {
-	if (_type == CoprocessorType::DSP1 || _type == CoprocessorType::DSP1B) {
-		//printf("[DSP] Reset\n");
+	if (_type == CoprocessorType::DSP1 || _type == CoprocessorType::DSP1B)
 		_dsp1.reset();
-	}
 }
 
 void NecDspHle::Run()
@@ -95,12 +93,10 @@ uint8_t NecDspHle::Read(uint32_t addr)
 {
 	if (_type == CoprocessorType::DSP1 || _type == CoprocessorType::DSP1B) {
 		uint8_t r;
-		if(addr & _registerMask) {
+		if(addr & _registerMask)
 			r = _dsp1.getSr();
-		} else {
+		else
 			r = _dsp1.getDr();
-		}
-		//printf("[DSP] Read (%x) => %d\n", addr, r);
 		return r;
 	}
 	return 0;
@@ -109,18 +105,15 @@ uint8_t NecDspHle::Read(uint32_t addr)
 void NecDspHle::Write(uint32_t addr, uint8_t value)
 {
 	if (_type == CoprocessorType::DSP1 || _type == CoprocessorType::DSP1B) {
-		if(addr & _registerMask) {
+		if(addr & _registerMask)
 			return;
-		} else {
-			//printf("[DSP] Write (%x) <= %d\n", addr, value);
-			return _dsp1.setDr(value);
-		}
+		_dsp1.setDr(value);
 	}
 }
 
 uint8_t NecDspHle::Peek(uint32_t addr)
 {
-	//Avoid side effects for now
+	/* Avoid side effects for now */
 	return 0;
 }
 

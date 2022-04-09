@@ -1,13 +1,7 @@
 /* Lzma2Dec.c -- LZMA2 Decoder
 2015-11-09 : Igor Pavlov : Public domain */
 
-/* #define SHOW_DEBUG_INFO */
-
 #include "Precomp.h"
-
-#ifdef SHOW_DEBUG_INFO
-#include <stdio.h>
-#endif
 
 #include <string.h>
 
@@ -39,12 +33,6 @@
 
 #define LZMA2_LCLP_MAX 4
 #define LZMA2_DIC_SIZE_FROM_PROP(p) (((UInt32)2 | ((p) & 1)) << ((p) / 2 + 11))
-
-#ifdef SHOW_DEBUG_INFO
-#define PRF(x) x
-#else
-#define PRF(x)
-#endif
 
 typedef enum
 {
@@ -103,8 +91,6 @@ static ELzma2State Lzma2Dec_UpdateState(CLzma2Dec *p, Byte b)
   {
     case LZMA2_STATE_CONTROL:
       p->control = b;
-      PRF(printf("\n %4X ", (unsigned)p->decoder.dicPos));
-      PRF(printf(" %2X", (unsigned)b));
       if (p->control == 0)
         return LZMA2_STATE_FINISHED;
       if (LZMA2_IS_UNCOMPRESSED_STATE(p))
@@ -124,7 +110,6 @@ static ELzma2State Lzma2Dec_UpdateState(CLzma2Dec *p, Byte b)
     case LZMA2_STATE_UNPACK1:
       p->unpackSize |= (UInt32)b;
       p->unpackSize++;
-      PRF(printf(" %8u", (unsigned)p->unpackSize));
       return (LZMA2_IS_UNCOMPRESSED_STATE(p)) ? LZMA2_STATE_DATA : LZMA2_STATE_PACK0;
     
     case LZMA2_STATE_PACK0:
@@ -134,7 +119,6 @@ static ELzma2State Lzma2Dec_UpdateState(CLzma2Dec *p, Byte b)
     case LZMA2_STATE_PACK1:
       p->packSize |= (UInt32)b;
       p->packSize++;
-      PRF(printf(" %8u", (unsigned)p->packSize));
       return LZMA2_IS_THERE_PROP(LZMA2_GET_LZMA_MODE(p)) ? LZMA2_STATE_PROP:
         (p->needInitProp ? LZMA2_STATE_ERROR : LZMA2_STATE_DATA);
 
