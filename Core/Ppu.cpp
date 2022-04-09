@@ -476,10 +476,6 @@ bool Ppu::ProcessEndOfScanline(uint16_t hClock)
 				_frameSkipTimer.GetElapsedMS() < 10
 			);
 			
-			if(_console->IsRunAheadFrame()) {
-				_skipRender = true;
-			}
-
 			//Ensure the SPC is re-enabled for the next frame
 			_spc->SetSpcState(true);
 		}

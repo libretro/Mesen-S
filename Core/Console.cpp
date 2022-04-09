@@ -48,7 +48,6 @@ Console::Console()
 	_paused = false;
 	_pauseOnNextFrame = false;
 	_stopFlag = false;
-	_isRunAheadFrame = false;
 	_lockCounter = 0;
 	_threadPaused = false;
 }
@@ -108,18 +107,6 @@ void Console::RunFrame()
 	}
 }
 
-bool Console::ProcessSystemActions()
-{
-	if(_controlManager->GetSystemActionManager()->IsResetPressed()) {
-		Reset();
-		return true;
-	} else if(_controlManager->GetSystemActionManager()->IsPowerCyclePressed()) {
-		PowerCycle();
-		return true;
-	}
-	return false;
-}
-
 void Console::ProcessEndOfFrame()
 {
 	_frameRunning = false;
@@ -127,9 +114,6 @@ void Console::ProcessEndOfFrame()
 
 void Console::RunSingleFrame()
 {
-	//Used by Libretro
-	_isRunAheadFrame = false;
-
 	_controlManager->UpdateInputState();
 	_internalRegisters->ProcessAutoJoypadRead();
 
@@ -156,11 +140,6 @@ void Console::Stop(bool sendNotification)
 	}
 
 	_emulationLock.WaitForRelease();
-
-	if(_emuThread) {
-		_emuThread->join();
-		_emuThread.release();
-	}
 
 	if(_cart && !_settings->GetPreferences().DisableGameSelectionScreen) {
 		RomInfo romInfo = _cart->GetRomInfo();
@@ -326,12 +305,6 @@ bool Console::LoadRom(VirtualFile romFile, VirtualFile patchFile, bool stopRom, 
 			string messageTitle = MessageManager::Localize("GameLoaded") + " (" + modelName + ")";
 			MessageManager::DisplayMessage(messageTitle, FolderUtilities::GetFilename(GetRomInfo().RomFile.GetFileName(), false));
 		}
-
-		if(stopRom) {
-			#ifndef LIBRETRO
-			_emuThread.reset(new thread(&Console::Run, this));
-			#endif
-		}
 		result = true;
 	} else {
 		MessageManager::DisplayMessage("Error", "CouldNotLoadFile", romFile.GetFileName());
@@ -401,43 +374,6 @@ double Console::GetFps()
 	}
 }
 
-double Console::GetFrameDelay()
-{
-	uint32_t emulationSpeed = _settings->GetEmulationSpeed();
-	double frameDelay;
-	if(emulationSpeed == 0) {
-		frameDelay = 0;
-	} else {
-		UpdateRegion();
-		if(_settings->CheckFlag(EmulationFlags::GameboyMode)) {
-			frameDelay = 16.74270629882813;
-		} else {
-			switch(_region) {
-				default:
-				case ConsoleRegion::Ntsc: frameDelay = _settings->GetVideoConfig().IntegerFpsMode ? 16.6666666666666666667 : 16.63926405550947; break;
-				case ConsoleRegion::Pal: frameDelay = _settings->GetVideoConfig().IntegerFpsMode ? 20 : 19.99720882631146; break;
-			}
-		}
-		frameDelay /= (emulationSpeed / 100.0);
-	}
-	return frameDelay;
-}
-
-void Console::PauseOnNextFrame()
-{
-	shared_ptr<Debugger> debugger = _debugger;
-	if(debugger) {
-		if(_settings->CheckFlag(EmulationFlags::GameboyMode)) {
-			debugger->Step(CpuType::Gameboy, 144, StepType::SpecificScanline);
-		} else {
-			debugger->Step(CpuType::Cpu, 240, StepType::SpecificScanline);
-		}
-	} else {
-		_pauseOnNextFrame = true;
-		_paused = false;
-	}
-}
-
 void Console::Pause()
 {
 	shared_ptr<Debugger> debugger = _debugger;
@@ -472,28 +408,6 @@ bool Console::IsPaused()
 	}
 }
 
-void Console::WaitForPauseEnd()
-{
-	_notificationManager->SendNotification(ConsoleNotificationType::GamePaused);
-
-	//Prevent audio from looping endlessly while game is paused
-	_soundMixer->StopAudio();
-	_runLock.Release();
-
-	PlatformUtilities::EnableScreensaver();
-	PlatformUtilities::RestoreTimerResolution();
-	while(_paused && !_stopFlag && !_debugger) {
-		//Sleep until emulation is resumed
-		std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(30));
-	}
-
-	PlatformUtilities::DisableScreensaver();
-	_runLock.Acquire();
-	if(!_stopFlag) {
-		_notificationManager->SendNotification(ConsoleNotificationType::GameResumed);
-	}
-}
-
 ConsoleLock Console::AcquireLock()
 {
 	return ConsoleLock(this);
@@ -519,33 +433,6 @@ void Console::Unlock()
 
 	_runLock.Release();
 	_lockCounter--;
-}
-
-bool Console::IsThreadPaused()
-{
-	return !_emuThread || _threadPaused;
-}
-
-void Console::WaitForLock()
-{
-	if(_lockCounter > 0) {
-		//Need to temporarely pause the emu (to save/load a state, etc.)
-		_runLock.Release();
-
-		_threadPaused = true;
-
-		//Spin wait until we are allowed to start again
-		while(_lockCounter > 0) {}
-
-		shared_ptr<Debugger> debugger = _debugger;
-		if(debugger) {
-			while(debugger->HasBreakRequest()) {}
-		}
-
-		_threadPaused = false;
-
-		_runLock.Acquire();
-	}
 }
 
 void Console::Serialize(ostream &out, int compressionLevel)
@@ -732,11 +619,6 @@ bool Console::IsDebugging()
 bool Console::IsRunning()
 {
 	return _cpu != nullptr;
-}
-
-bool Console::IsRunAheadFrame()
-{
-	return _isRunAheadFrame;
 }
 
 uint32_t Console::GetFrameCount()

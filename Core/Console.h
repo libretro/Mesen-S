@@ -42,8 +42,6 @@ enum class ConsoleType;
 class Console : public std::enable_shared_from_this<Console>
 {
 private:
-	unique_ptr<thread> _emuThread;
-
 	shared_ptr<Cpu> _cpu;
 	shared_ptr<Ppu> _ppu;
 	shared_ptr<Spc> _spc;
@@ -83,21 +81,11 @@ private:
 	ConsoleType _consoleType;
 	uint32_t _masterClockRate;
 
-	atomic<bool> _isRunAheadFrame;
 	bool _frameRunning = false;
 
-	unique_ptr<DebugStats> _stats;
-	unique_ptr<FrameLimiter> _frameLimiter;
-	Timer _lastFrameTimer;
-	double _frameDelay = 0;
-
-	double GetFrameDelay();
 	void UpdateRegion();
-	void WaitForLock();
-	void WaitForPauseEnd();
 
 	void RunFrame();
-	bool ProcessSystemActions();
 
 public:
 	Console();
@@ -116,8 +104,6 @@ public:
 	void ReloadRom(bool forPowerCycle);
 	void PowerCycle();
 
-	void PauseOnNextFrame();
-	
 	void Pause();
 	void Resume();
 	bool IsPaused();
@@ -132,7 +118,6 @@ public:
 	ConsoleLock AcquireLock();
 	void Lock();
 	void Unlock();
-	bool IsThreadPaused();
 
 	void Serialize(ostream &out, int compressionLevel = 0);
 	void Deserialize(istream &in, uint32_t fileFormatVersion, bool compressed = false);
@@ -163,10 +148,7 @@ public:
 	void StopDebugger();
 	bool IsDebugging();
 
-	thread::id GetEmulationThreadId();
-	
 	bool IsRunning();
-	bool IsRunAheadFrame();
 
 	uint32_t GetFrameCount();	
 	double GetFps();

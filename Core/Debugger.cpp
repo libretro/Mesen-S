@@ -431,7 +431,7 @@ void Debugger::Step(CpuType cpuType, int32_t stepCount, StepType type)
 
 bool Debugger::IsExecutionStopped()
 {
-	return _executionStopped || _console->IsThreadPaused();
+	return _executionStopped;
 }
 
 bool Debugger::HasBreakRequest()
