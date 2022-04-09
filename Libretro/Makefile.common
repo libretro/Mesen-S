@@ -131,8 +131,6 @@ SOURCES_CXX := $(LIBRETRO_DIR)/libretro.cpp \
                $(CORE_DIR)/WaveRecorder.cpp \
                $(UTIL_DIR)/ArchiveReader.cpp \
                $(UTIL_DIR)/AutoResetEvent.cpp \
-               $(UTIL_DIR)/AviRecorder.cpp \
-               $(UTIL_DIR)/AviWriter.cpp \
                $(UTIL_DIR)/blip_buf.cpp \
                $(UTIL_DIR)/BpsPatcher.cpp \
                $(UTIL_DIR)/CamstudioCodec.cpp \
@@ -160,7 +158,6 @@ SOURCES_CXX := $(LIBRETRO_DIR)/libretro.cpp \
                $(UTIL_DIR)/VirtualFile.cpp \
                $(UTIL_DIR)/ZipReader.cpp \
                $(UTIL_DIR)/ZipWriter.cpp \
-               $(UTIL_DIR)/ZmbvCodec.cpp \
                $(UTIL_DIR)/HQX/hq2x.cpp \
                $(UTIL_DIR)/HQX/hq3x.cpp \
                $(UTIL_DIR)/HQX/hq4x.cpp \
