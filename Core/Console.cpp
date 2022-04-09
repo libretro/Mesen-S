@@ -134,11 +134,6 @@ void Console::Stop(bool sendNotification)
 
 	_emulationLock.WaitForRelease();
 
-	if(_cart && !_settings->GetPreferences().DisableGameSelectionScreen) {
-		RomInfo romInfo = _cart->GetRomInfo();
-		_saveStateManager->SaveRecentGame(romInfo.RomFile.GetFileName(), romInfo.RomFile, romInfo.PatchFile);
-	}
-
 	if(sendNotification) {
 		_notificationManager->SendNotification(ConsoleNotificationType::BeforeEmulationStop);
 	}
