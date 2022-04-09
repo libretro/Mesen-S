@@ -147,7 +147,7 @@ void NecDsp::Run()
 {
 	uint64_t targetCycle = (uint64_t)(_memoryManager->GetMasterClock() * (_frequency / _console->GetMasterClockRate()));
 
-	if(_inRqmLoop && !_console->IsDebugging()) {
+	if(_inRqmLoop) {
 		_cycleCount = targetCycle;
 		return;
 	}

@@ -155,10 +155,6 @@ void SuperGameboy::ProcessInputPortWrite(uint8_t value)
 			if(_packetByte >= 16 && _packetBit == 0) {
 				_packetReady = true;
 				_listeningForPacket = false;
-
-				if(_console->IsDebugging()) {
-					LogPacket();
-				}
 			} else {
 				_packetData[_packetByte] &= ~(1 << _packetBit);
 			}

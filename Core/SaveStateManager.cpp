@@ -100,11 +100,6 @@ bool SaveStateManager::SaveState(string filepath)
 		SaveState(file);
 		_console->Unlock();
 		file.close();
-
-		shared_ptr<Debugger> debugger = _console->GetDebugger(false);
-		if(debugger) {
-			debugger->ProcessEvent(EventType::StateSaved);
-		}
 		return true;
 	}
 	return false;
@@ -229,25 +224,18 @@ bool SaveStateManager::LoadState(istream &stream, bool hashCheckRequired)
 bool SaveStateManager::LoadState(string filepath, bool hashCheckRequired)
 {
 	ifstream file(filepath, ios::in | ios::binary);
-	bool result = false;
 
-	if(file.good()) {
+	if(file.good())
+	{
+		bool result;
 		_console->Lock();
 		result = LoadState(file, hashCheckRequired);
 		_console->Unlock();
 		file.close();
-
-		if(result) {
-			shared_ptr<Debugger> debugger = _console->GetDebugger(false);
-			if(debugger) {
-				debugger->ProcessEvent(EventType::StateLoaded);
-			}
-		}
-	} else {
-		MessageManager::DisplayMessage("SaveStates", "SaveStateEmpty");
+		return result;
 	}
 
-	return result;
+	return false;
 }
 
 bool SaveStateManager::LoadState(int stateIndex)

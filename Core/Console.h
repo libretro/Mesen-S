@@ -143,10 +143,6 @@ public:
 	shared_ptr<DmaController> GetDmaController();
 	shared_ptr<Msu1> GetMsu1();
 
-	shared_ptr<Debugger> GetDebugger(bool autoStart = true);
-	void StopDebugger();
-	bool IsDebugging();
-
 	bool IsRunning();
 
 	uint32_t GetFrameCount();	

@@ -155,12 +155,6 @@ void ControlManager::UpdateInputState()
 		}
 
 		device->OnAfterSetState();
-		//log += "|" + device->GetTextState();
-	}
-
-	shared_ptr<Debugger> debugger = _console->GetDebugger(false);
-	if(debugger) {
-		debugger->ProcessEvent(EventType::InputPolled);
 	}
 
 	for(IInputRecorder* recorder : _inputRecorders)

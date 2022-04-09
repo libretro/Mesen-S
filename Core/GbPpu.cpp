@@ -187,11 +187,6 @@ void GbPpu::ProcessVblankScanline()
 				_state.Scanline = 0;
 				_state.Ly = 0;
 				_state.LyForCompare = 0;
-
-				if(_console->IsDebugging()) {
-					_console->ProcessEvent(EventType::GbStartFrame);
-					_currentEventViewerBuffer = _currentEventViewerBuffer == _eventViewerBuffers[0] ? _eventViewerBuffers[1] : _eventViewerBuffers[0];
-				}
 			} else {
 				_state.Ly = _state.Scanline;
 				_state.LyForCompare = -1;
@@ -301,18 +296,6 @@ void GbPpu::ProcessVisibleScanline()
 
 void GbPpu::ProcessPpuCycle()
 {
-	if(_console->IsDebugging()) {
-		_console->ProcessPpuCycle<CpuType::Gameboy>();
-		if(_state.Mode <= PpuMode::OamEvaluation) {
-			_currentEventViewerBuffer[456 * _state.Scanline + _state.Cycle] = evtColors[(int)_state.Mode];
-		} else if(_prevDrawnPixels != _drawnPixels && _drawnPixels > 0) {
-			uint16_t color = _currentBuffer[_state.Scanline * 256 + (_drawnPixels - 1)];
-			_currentEventViewerBuffer[456 * _state.Scanline + _state.Cycle] = color;
-		} else {
-			_currentEventViewerBuffer[456 * _state.Scanline + _state.Cycle] = evtColors[(int)_evtColor];
-		}
-		_prevDrawnPixels = _drawnPixels;
-	}
 }
 
 void GbPpu::RunDrawCycle()
@@ -743,15 +726,6 @@ void GbPpu::Write(uint16_t addr, uint8_t value)
 					ResetRenderer();
 					_state.LyCoincidenceFlag = _state.LyCompare == _state.LyForCompare;
 					UpdateStatIrq();
-					
-					if(_console->IsDebugging()) {
-						_console->ProcessEvent(EventType::GbStartFrame);
-
-						_currentEventViewerBuffer = _currentEventViewerBuffer == _eventViewerBuffers[0] ? _eventViewerBuffers[1] : _eventViewerBuffers[0];
-						for(int i = 0; i < 456 * 154; i++) {
-							_currentEventViewerBuffer[i] = 0x18C6;
-						}
-					}
 				}
 			}
 			_state.WindowTilemapSelect = (value & 0x40) != 0;

@@ -132,12 +132,6 @@ void Console::Stop(bool sendNotification)
 
 	_notificationManager->SendNotification(ConsoleNotificationType::BeforeGameUnload);
 
-	shared_ptr<Debugger> debugger = _debugger;
-	if(debugger) {
-		debugger->SuspendDebugger(false);
-		debugger->Run();
-	}
-
 	_emulationLock.WaitForRelease();
 
 	if(_cart && !_settings->GetPreferences().DisableGameSelectionScreen) {
@@ -151,10 +145,6 @@ void Console::Stop(bool sendNotification)
 
 	_consoleType = ConsoleType::Snes;
 	_settings->ClearFlag(EmulationFlags::GameboyMode);
-
-	//Make sure we release both pointers to destroy the debugger before everything else
-	_debugger.reset();
-	debugger.reset();
 
 	_videoDecoder->StopThread();
 	_rewindManager.reset();
@@ -178,8 +168,6 @@ void Console::Stop(bool sendNotification)
 
 void Console::Reset()
 {
-	shared_ptr<Debugger> debugger = _debugger;
-
 	_lockCounter++;
 	_runLock.Acquire();
 
@@ -197,11 +185,6 @@ void Console::Reset()
 	_notificationManager->SendNotification(ConsoleNotificationType::GameReset);
 	ProcessEvent(EventType::Reset);
 
-	if(debugger) {
-		//Debugger was suspended in SystemActionManager::Reset(), resume debugger here
-		debugger->SuspendDebugger(true);
-	}
-
 	_runLock.Release(); 
 	_lockCounter--;
 }
@@ -210,11 +193,6 @@ void Console::ReloadRom(bool forPowerCycle)
 {
 	shared_ptr<BaseCartridge> cart = _cart;
 	if(cart) {
-		shared_ptr<Debugger> debugger = _debugger;
-		if(debugger) {
-			debugger->Run();
-		}
-
 		RomInfo info = cart->GetRomInfo();
 		Lock();
 		LoadRom(info.RomFile, info.PatchFile, false, forPowerCycle);
@@ -238,7 +216,6 @@ bool Console::LoadRom(VirtualFile romFile, VirtualFile patchFile, bool stopRom, 
 	EmulationConfig orgConfig = _settings->GetEmulationConfig(); //backup emulation config (can be temporarily overriden to control the power on RAM state)
 	shared_ptr<BaseCartridge> cart = forPowerCycle ? _cart : BaseCartridge::CreateCartridge(this, romFile, patchFile);
 	if(cart) {
-		bool debuggerActive = _debugger != nullptr;
 		if(stopRom) {
 			KeyManager::UpdateDevices();
 			Stop(false);
@@ -248,13 +225,6 @@ bool Console::LoadRom(VirtualFile romFile, VirtualFile patchFile, bool stopRom, 
 		
 		_cart = cart;
 		
-		auto lock = _debuggerLock.AcquireSafe();
-		if(_debugger) {
-			//Reset debugger if it was running before
-			_debugger->Release();
-			_debugger.reset();
-		}
-
 		_batteryManager->Initialize(FolderUtilities::GetFilename(romFile.GetFileName(), false));
 
 		UpdateRegion();
@@ -279,10 +249,6 @@ bool Console::LoadRom(VirtualFile romFile, VirtualFile patchFile, bool stopRom, 
 		} else {
 			_consoleType = ConsoleType::Snes;
 			_settings->ClearFlag(EmulationFlags::GameboyMode);
-		}
-
-		if(debuggerActive) {
-			GetDebugger();
 		}
 
 		_ppu->PowerOn();
@@ -375,36 +341,17 @@ double Console::GetFps()
 
 void Console::Pause()
 {
-	shared_ptr<Debugger> debugger = _debugger;
-	if(debugger) {
-		if(_settings->CheckFlag(EmulationFlags::GameboyMode)) {
-			debugger->Step(CpuType::Gameboy, 1, StepType::Step);
-		} else {
-			debugger->Step(CpuType::Cpu, 1, StepType::Step);
-		}
-	} else {
-		_paused = true;
-	}
+	_paused = true;
 }
 
 void Console::Resume()
 {
-	shared_ptr<Debugger> debugger = _debugger;
-	if(debugger) {
-		debugger->Run();
-	} else {
-		_paused = false;
-	}
+	_paused = false;
 }
 
 bool Console::IsPaused()
 {
-	shared_ptr<Debugger> debugger = _debugger;
-	if(debugger) {
-		return debugger->IsExecutionStopped();
-	} else {
-		return _paused;
-	}
+	return _paused;
 }
 
 ConsoleLock Console::AcquireLock()
@@ -414,22 +361,12 @@ ConsoleLock Console::AcquireLock()
 
 void Console::Lock()
 {
-	shared_ptr<Debugger> debugger = _debugger;
-	if(debugger) {
-		debugger->SuspendDebugger(false);
-	}
-
 	_lockCounter++;
 	_runLock.Acquire();
 }
 
 void Console::Unlock()
 {
-	shared_ptr<Debugger> debugger = _debugger;
-	if(debugger) {
-		debugger->SuspendDebugger(true);
-	}
-
 	_runLock.Release();
 	_lockCounter--;
 }
@@ -582,39 +519,6 @@ shared_ptr<Msu1> Console::GetMsu1()
 	return _msu1;
 }
 
-shared_ptr<Debugger> Console::GetDebugger(bool autoStart)
-{
-	shared_ptr<Debugger> debugger = _debugger;
-	if(!debugger && autoStart) {
-		//Lock to make sure we don't try to start debuggers in 2 separate threads at once
-		auto lock = _debuggerLock.AcquireSafe();
-		debugger = _debugger;
-		if(!debugger) {
-			debugger.reset(new Debugger(shared_from_this()));
-			_debugger = debugger;
-		}
-	}
-	return debugger;
-}
-
-void Console::StopDebugger()
-{
-	//Pause/unpause the regular emulation thread based on the debugger's pause state
-	_paused = IsPaused();
-
-	shared_ptr<Debugger> debugger = _debugger;
-	debugger->SuspendDebugger(false);
-	Lock();
-	_debugger.reset();
-
-	Unlock();
-}
-
-bool Console::IsDebugging()
-{
-	return _debugger != nullptr;
-}
-
 bool Console::IsRunning()
 {
 	return _cpu != nullptr;
@@ -635,23 +539,14 @@ uint32_t Console::GetFrameCount()
 template<CpuType type>
 void Console::ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool forNmi)
 {
-	if(_debugger) {
-		_debugger->ProcessInterrupt<type>(originalPc, currentPc, forNmi);
-	}
 }
 
 void Console::ProcessEvent(EventType type)
 {
-	if(_debugger) {
-		_debugger->ProcessEvent(type);
-	}
 }
 
 void Console::BreakImmediately(BreakSource source)
 {
-	if(_debugger) {
-		_debugger->BreakImmediately(source);
-	}
 }
 
 template void Console::ProcessMemoryRead<CpuType::Cpu>(uint32_t addr, uint8_t value, MemoryOperationType opType);
