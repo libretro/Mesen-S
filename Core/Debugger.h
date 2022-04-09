@@ -22,7 +22,6 @@ class MemoryDumper;
 class MemoryAccessCounter;
 class Disassembler;
 class BreakpointManager;
-class PpuTools;
 class CodeDataLogger;
 class EventManager;
 class CallstackManager;
@@ -71,7 +70,6 @@ private:
 	shared_ptr<MemoryAccessCounter> _memoryAccessCounter;
 	shared_ptr<CodeDataLogger> _codeDataLogger;
 	shared_ptr<Disassembler> _disassembler;
-	shared_ptr<PpuTools> _ppuTools;
 	shared_ptr<LabelManager> _labelManager;
 
 	unique_ptr<ExpressionEvaluator> _watchExpEval[(int)DebugUtilities::GetLastCpuType() + 1];
@@ -118,8 +116,6 @@ public:
 	void Step(CpuType cpuType, int32_t stepCount, StepType type);
 	bool IsExecutionStopped();
 
-	bool HasBreakRequest();
-	void BreakRequest(bool release);
 	void SuspendDebugger(bool release);
 
 	void BreakImmediately(BreakSource source);
@@ -144,14 +140,11 @@ public:
 	void Log(string message);
 	string GetLog();
 
-	void SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption);
-
 	shared_ptr<TraceLogger> GetTraceLogger();
 	shared_ptr<MemoryDumper> GetMemoryDumper();
 	shared_ptr<MemoryAccessCounter> GetMemoryAccessCounter();
 	shared_ptr<CodeDataLogger> GetCodeDataLogger(CpuType cpuType);
 	shared_ptr<Disassembler> GetDisassembler();
-	shared_ptr<PpuTools> GetPpuTools();
 	shared_ptr<IEventManager> GetEventManager(CpuType cpuType);
 	shared_ptr<LabelManager> GetLabelManager();
 	shared_ptr<ScriptManager> GetScriptManager();

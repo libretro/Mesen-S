@@ -49,7 +49,6 @@ SOURCES_CXX := $(LIBRETRO_DIR)/libretro.cpp \
                $(CORE_DIR)/Cx4Debugger.cpp \
                $(CORE_DIR)/Debugger.cpp \
                $(CORE_DIR)/DebugHud.cpp \
-               $(CORE_DIR)/DebugStats.cpp \
                $(CORE_DIR)/DefaultVideoFilter.cpp \
                $(CORE_DIR)/Disassembler.cpp \
                $(CORE_DIR)/DisassemblyInfo.cpp \
@@ -99,7 +98,6 @@ SOURCES_CXX := $(LIBRETRO_DIR)/libretro.cpp \
                $(CORE_DIR)/Obc1.cpp \
                $(CORE_DIR)/PcmReader.cpp \
                $(CORE_DIR)/Ppu.cpp \
-               $(CORE_DIR)/PpuTools.cpp \
                $(CORE_DIR)/Profiler.cpp \
                $(CORE_DIR)/RegisterHandlerB.cpp \
                $(CORE_DIR)/RewindData.cpp \

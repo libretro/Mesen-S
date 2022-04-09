@@ -30,7 +30,6 @@ class CheatManager;
 class MovieManager;
 class SpcHud;
 class FrameLimiter;
-class DebugStats;
 class Msu1;
 
 enum class MemoryOperationType;

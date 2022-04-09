@@ -30,7 +30,6 @@
 #include "CodeDataLogger.h"
 #include "Disassembler.h"
 #include "BreakpointManager.h"
-#include "PpuTools.h"
 #include "EventManager.h"
 #include "GbEventManager.h"
 #include "EventType.h"
@@ -76,7 +75,6 @@ Debugger::Debugger(shared_ptr<Console> console)
 	_disassembler.reset(new Disassembler(console, _codeDataLogger, this));
 	_traceLogger.reset(new TraceLogger(this, _console));
 	_memoryAccessCounter.reset(new MemoryAccessCounter(this, console.get()));
-	_ppuTools.reset(new PpuTools(_console.get(), _ppu.get()));
 	_scriptManager.reset(new ScriptManager(this));
 
 	if(_gameboy) {
@@ -224,8 +222,6 @@ void Debugger::ProcessPpuCycle()
 		scanline = _ppu->GetScanline();
 		cycle = _memoryManager->GetHClock();
 	}
-
-	_ppuTools->UpdateViewers(scanline, cycle, cpuType);
 
 	switch(cpuType) {
 		case CpuType::Cpu: 
@@ -432,20 +428,6 @@ void Debugger::Step(CpuType cpuType, int32_t stepCount, StepType type)
 bool Debugger::IsExecutionStopped()
 {
 	return _executionStopped;
-}
-
-bool Debugger::HasBreakRequest()
-{
-	return _breakRequestCount > 0;
-}
-
-void Debugger::BreakRequest(bool release)
-{
-	if(release) {
-		_breakRequestCount--;
-	} else {
-		_breakRequestCount++;
-	}
 }
 
 void Debugger::SuspendDebugger(bool release)
@@ -691,45 +673,6 @@ string Debugger::GetLog()
 	return ss.str();
 }
 
-void Debugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption)
-{
-	vector<uint8_t> output;
-	RomInfo romInfo = _cart->GetRomInfo();
-	Gameboy* gb = _cart->GetGameboy();
-
-	vector<uint8_t> rom;
-	if(gb) {
-		uint8_t* prgRom = gb->DebugGetMemory(SnesMemoryType::GbPrgRom);
-		uint32_t prgRomSize = gb->DebugGetMemorySize(SnesMemoryType::GbPrgRom);
-		rom = vector<uint8_t>(prgRom, prgRom+prgRomSize);
-	} else {
-		rom = vector<uint8_t>(_cart->DebugGetPrgRom(), _cart->DebugGetPrgRom() + _cart->DebugGetPrgRomSize());
-	}
-
-	if(saveAsIps) {
-		output = IpsPatcher::CreatePatch(_cart->GetOriginalPrgRom(), rom);
-	} else {
-		if(stripOption != CdlStripOption::StripNone) {
-			GetCodeDataLogger(gb ? CpuType::Gameboy : CpuType::Cpu)->StripData(rom.data(), stripOption);
-
-			//Preserve rom header regardless of CDL file contents
-			if(gb) {
-				GameboyHeader header = gb->GetHeader();
-				memcpy(rom.data() + romInfo.HeaderOffset, &header, sizeof(GameboyHeader));
-			} else {
-				memcpy(rom.data() + romInfo.HeaderOffset, &romInfo.Header, sizeof(SnesCartInformation));
-			}
-		}
-		output = rom;
-	}
-
-	ofstream file(filename, ios::out | ios::binary);
-	if(file) {
-		file.write((char*)output.data(), output.size());
-		file.close();
-	}
-}
-
 shared_ptr<TraceLogger> Debugger::GetTraceLogger()
 {
 	return _traceLogger;
@@ -757,11 +700,6 @@ shared_ptr<CodeDataLogger> Debugger::GetCodeDataLogger(CpuType cpuType)
 shared_ptr<Disassembler> Debugger::GetDisassembler()
 {
 	return _disassembler;
-}
-
-shared_ptr<PpuTools> Debugger::GetPpuTools()
-{
-	return _ppuTools;
 }
 
 shared_ptr<IEventManager> Debugger::GetEventManager(CpuType cpuType)

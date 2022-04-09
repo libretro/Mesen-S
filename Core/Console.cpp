@@ -25,7 +25,6 @@
 #include "EventType.h"
 #include "EmuSettings.h"
 #include "SaveStateManager.h"
-#include "DebugStats.h"
 #include "CartTypes.h"
 #include "RewindManager.h"
 #include "ConsoleLock.h"
