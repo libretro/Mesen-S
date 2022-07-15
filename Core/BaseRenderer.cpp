@@ -26,27 +26,6 @@ void BaseRenderer::DisplayMessage(string title, string message)
 	_toasts.push_front(toast);
 }
 
-void BaseRenderer::RemoveOldToasts()
-{
-	_toasts.remove_if([](shared_ptr<ToastInfo> toast) { return toast->IsToastExpired(); });
-}
-
-void BaseRenderer::DrawToasts()
-{
-	RemoveOldToasts();
-
-	int counter = 0;
-	int lastHeight = 5;
-	for(shared_ptr<ToastInfo> toast : _toasts) {
-		if(counter < 6) {
-			DrawToast(toast, lastHeight);
-		} else {
-			break;
-		}
-		counter++;
-	}
-}
-
 std::wstring BaseRenderer::WrapText(string utf8Text, float maxLineWidth, uint32_t &lineCount)
 {
 	using std::wstring;
@@ -94,27 +73,8 @@ std::wstring BaseRenderer::WrapText(string utf8Text, float maxLineWidth, uint32_
 	return wrappedText;
 }
 
-void BaseRenderer::DrawToast(shared_ptr<ToastInfo> toast, int &lastHeight)
-{
-	//Get opacity for fade in/out effect
-	uint8_t opacity = (uint8_t)(toast->GetOpacity()*255);
-	int textLeftMargin = 4;
-
-	int lineHeight = 25;
-	string text = "[" + toast->GetToastTitle() + "] " + toast->GetToastMessage();
-	uint32_t lineCount = 0;
-	std::wstring wrappedText = WrapText(text, (float)(_screenWidth - textLeftMargin * 2 - 20), lineCount);
-	lastHeight += lineCount * lineHeight;
-	DrawString(wrappedText, textLeftMargin, _screenHeight - lastHeight, opacity, opacity, opacity, opacity);
-}
-
 void BaseRenderer::DrawString(std::string message, int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t opacity)
 {
 	std::wstring textStr = utf8::utf8::decode(message);
 	DrawString(textStr, x, y, r, g, b, opacity);
 }
-
-bool BaseRenderer::IsMessageShown()
-{
-	return !_toasts.empty();
-}	
