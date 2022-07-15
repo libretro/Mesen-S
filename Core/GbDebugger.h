@@ -5,7 +5,6 @@
 
 class Disassembler;
 class Debugger;
-class TraceLogger;
 class Gameboy;
 class CallstackManager;
 class MemoryAccessCounter;
@@ -21,7 +20,6 @@ class GbDebugger final : public IDebugger
 	Debugger* _debugger;
 	Console* _console;
 	Disassembler* _disassembler;
-	TraceLogger* _traceLogger;
 	MemoryAccessCounter* _memoryAccessCounter;
 	Gameboy* _gameboy;
 	EmuSettings* _settings;

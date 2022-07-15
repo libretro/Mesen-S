@@ -3,7 +3,6 @@
 #include "NecDspDebugger.h"
 #include "DisassemblyInfo.h"
 #include "Disassembler.h"
-#include "TraceLogger.h"
 #include "CallstackManager.h"
 #include "BreakpointManager.h"
 #include "BaseCartridge.h"
@@ -17,7 +16,6 @@
 NecDspDebugger::NecDspDebugger(Debugger* debugger)
 {
 	_debugger = debugger;
-	_traceLogger = debugger->GetTraceLogger().get();
 	_disassembler = debugger->GetDisassembler().get();
 	_dsp = debugger->GetConsole()->GetCartridge()->GetDsp();
 	_settings = debugger->GetConsole()->GetSettings().get();
@@ -36,16 +34,8 @@ void NecDspDebugger::ProcessRead(uint16_t addr, uint8_t value, MemoryOperationTy
 	MemoryOperationInfo operation { (uint32_t)addr, value, type };
 
 	if(type == MemoryOperationType::ExecOpCode) {
-		if(_traceLogger->IsCpuLogged(CpuType::NecDsp) || _settings->CheckDebuggerFlag(DebuggerFlags::NecDspDebuggerEnabled)) {
+		if(_settings->CheckDebuggerFlag(DebuggerFlags::NecDspDebuggerEnabled)) {
 			_disassembler->BuildCache(addressInfo, 0, CpuType::NecDsp);
-
-			if(_traceLogger->IsCpuLogged(CpuType::NecDsp)) {
-				DebugState debugState;
-				_debugger->GetState(debugState, true);
-
-				DisassemblyInfo disInfo = _disassembler->GetDisassemblyInfo(addressInfo, addr, 0, CpuType::NecDsp);
-				_traceLogger->Log(CpuType::NecDsp, debugState, disInfo);
-			}
 		}
 
 		_prevProgramCounter = addr;

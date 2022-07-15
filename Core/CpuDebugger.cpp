@@ -6,7 +6,6 @@
 #include "Disassembler.h"
 #include "Cpu.h"
 #include "Sa1.h"
-#include "TraceLogger.h"
 #include "CallstackManager.h"
 #include "BreakpointManager.h"
 #include "MemoryManager.h"
@@ -28,7 +27,6 @@ CpuDebugger::CpuDebugger(Debugger* debugger, CpuType cpuType)
 	_cpuType = cpuType;
 
 	_debugger = debugger;
-	_traceLogger = debugger->GetTraceLogger().get();
 	_disassembler = debugger->GetDisassembler().get();
 	_memoryAccessCounter = debugger->GetMemoryAccessCounter().get();
 	_cpu = debugger->GetConsole()->GetCpu().get();
@@ -64,7 +62,7 @@ void CpuDebugger::ProcessRead(uint32_t addr, uint8_t value, MemoryOperationType 
 	BreakSource breakSource = BreakSource::Unspecified;
 
 	if(type == MemoryOperationType::ExecOpCode) {
-		bool needDisassemble = _traceLogger->IsCpuLogged(_cpuType) || _settings->CheckDebuggerFlag(_cpuType == CpuType::Cpu ? DebuggerFlags::CpuDebuggerEnabled : DebuggerFlags::Sa1DebuggerEnabled);
+		bool needDisassemble = _settings->CheckDebuggerFlag(_cpuType == CpuType::Cpu ? DebuggerFlags::CpuDebuggerEnabled : DebuggerFlags::Sa1DebuggerEnabled);
 		if(addressInfo.Address >= 0) {
 			if(addressInfo.Type == SnesMemoryType::PrgRom) {
 				uint8_t flags = CdlFlags::Code | (state.PS & (CdlFlags::IndexMode8 | CdlFlags::MemoryMode8));
@@ -76,13 +74,6 @@ void CpuDebugger::ProcessRead(uint32_t addr, uint8_t value, MemoryOperationType 
 			if(needDisassemble) {
 				_disassembler->BuildCache(addressInfo, state.PS & (ProcFlags::IndexMode8 | ProcFlags::MemoryMode8), _cpuType);
 			}
-		}
-
-		if(_traceLogger->IsCpuLogged(_cpuType)) {
-			_debugger->GetState(_debugState, true);
-
-			DisassemblyInfo disInfo = _disassembler->GetDisassemblyInfo(addressInfo, addr, state.PS, _cpuType);
-			_traceLogger->Log(_cpuType, _debugState, disInfo);
 		}
 
 		uint32_t pc = (state.K << 16) | state.PC;

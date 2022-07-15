@@ -5,7 +5,6 @@
 
 class Disassembler;
 class Debugger;
-class TraceLogger;
 class CodeDataLogger;
 class Cx4;
 class CallstackManager;
@@ -18,7 +17,6 @@ class Cx4Debugger final : public IDebugger
 {
 	Debugger* _debugger;
 	Disassembler* _disassembler;
-	TraceLogger* _traceLogger;
 	CodeDataLogger* _codeDataLogger;
 	MemoryAccessCounter* _memoryAccessCounter;
 	MemoryManager* _memoryManager;

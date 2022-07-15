@@ -3,7 +3,6 @@
 #include "DisassemblyInfo.h"
 #include "Disassembler.h"
 #include "Gameboy.h"
-#include "TraceLogger.h"
 #include "CallstackManager.h"
 #include "BreakpointManager.h"
 #include "MemoryManager.h"
@@ -24,7 +23,6 @@ GbDebugger::GbDebugger(Debugger* debugger)
 {
 	_debugger = debugger;
 	_console = debugger->GetConsole().get();
-	_traceLogger = debugger->GetTraceLogger().get();
 	_disassembler = debugger->GetDisassembler().get();
 	_memoryAccessCounter = debugger->GetMemoryAccessCounter().get();
 	_gameboy = debugger->GetConsole()->GetCartridge()->GetGameboy();
@@ -62,20 +60,12 @@ void GbDebugger::ProcessRead(uint16_t addr, uint8_t value, MemoryOperationType t
 	if(type == MemoryOperationType::ExecOpCode) {
 		GbCpuState gbState = _gameboy->GetState().Cpu;
 
-		if(_traceLogger->IsCpuLogged(CpuType::Gameboy) || _settings->CheckDebuggerFlag(DebuggerFlags::GbDebuggerEnabled)) {
+		if(_settings->CheckDebuggerFlag(DebuggerFlags::GbDebuggerEnabled)) {
 			if(addressInfo.Address >= 0) {
 				if(addressInfo.Type == SnesMemoryType::GbPrgRom) {
 					_codeDataLogger->SetFlags(addressInfo.Address, CdlFlags::Code);
 				}
 				_disassembler->BuildCache(addressInfo, 0, CpuType::Gameboy);
-			}
-
-			if(_traceLogger->IsCpuLogged(CpuType::Gameboy)) {
-				DebugState debugState;
-				_debugger->GetState(debugState, true);
-
-				DisassemblyInfo disInfo = _disassembler->GetDisassemblyInfo(addressInfo, addr, 0, CpuType::Gameboy);
-				_traceLogger->Log(CpuType::Gameboy, debugState, disInfo);
 			}
 		}
 

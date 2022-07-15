@@ -5,7 +5,6 @@
 
 class Disassembler;
 class Debugger;
-class TraceLogger;
 class Cpu;
 class CallstackManager;
 class MemoryAccessCounter;
@@ -23,7 +22,6 @@ class CpuDebugger final : public IDebugger
 {
 	Debugger* _debugger;
 	Disassembler* _disassembler;
-	TraceLogger* _traceLogger;
 	MemoryAccessCounter* _memoryAccessCounter;
 	MemoryManager* _memoryManager;
 	EmuSettings* _settings;

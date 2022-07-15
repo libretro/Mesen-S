@@ -3,7 +3,6 @@
 #include "DisassemblyInfo.h"
 #include "Disassembler.h"
 #include "Spc.h"
-#include "TraceLogger.h"
 #include "CallstackManager.h"
 #include "BreakpointManager.h"
 #include "MemoryManager.h"
@@ -16,7 +15,6 @@
 SpcDebugger::SpcDebugger(Debugger* debugger)
 {
 	_debugger = debugger;
-	_traceLogger = debugger->GetTraceLogger().get();
 	_disassembler = debugger->GetDisassembler().get();
 	_memoryAccessCounter = debugger->GetMemoryAccessCounter().get();
 	_spc = debugger->GetConsole()->GetSpc().get();
@@ -48,15 +46,8 @@ void SpcDebugger::ProcessRead(uint16_t addr, uint8_t value, MemoryOperationType 
 	if(type == MemoryOperationType::ExecOpCode) {
 		SpcState spcState = _spc->GetState();
 
-		if(_traceLogger->IsCpuLogged(CpuType::Spc) || _settings->CheckDebuggerFlag(DebuggerFlags::SpcDebuggerEnabled)) {
+		if(_settings->CheckDebuggerFlag(DebuggerFlags::SpcDebuggerEnabled)) {
 			_disassembler->BuildCache(addressInfo, 0, CpuType::Spc);
-
-			if(_traceLogger->IsCpuLogged(CpuType::Spc)) {
-				_debugger->GetState(_debugState, true);
-
-				DisassemblyInfo disInfo = _disassembler->GetDisassemblyInfo(addressInfo, addr, 0, CpuType::Spc);
-				_traceLogger->Log(CpuType::Spc, _debugState, disInfo);
-			}
 		}
 
 		if(_prevOpCode == 0x3F || _prevOpCode == 0x0F) {

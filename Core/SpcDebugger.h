@@ -5,7 +5,6 @@
 
 class Disassembler;
 class Debugger;
-class TraceLogger;
 class Spc;
 class CallstackManager;
 class MemoryAccessCounter;
@@ -17,7 +16,6 @@ class SpcDebugger final : public IDebugger
 {
 	Debugger* _debugger;
 	Disassembler* _disassembler;
-	TraceLogger* _traceLogger;
 	MemoryAccessCounter* _memoryAccessCounter;
 	MemoryManager* _memoryManager;
 	Spc* _spc;

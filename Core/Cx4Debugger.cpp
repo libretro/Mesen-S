@@ -3,7 +3,6 @@
 #include "Cx4Debugger.h"
 #include "DisassemblyInfo.h"
 #include "Disassembler.h"
-#include "TraceLogger.h"
 #include "CallstackManager.h"
 #include "BreakpointManager.h"
 #include "BaseCartridge.h"
@@ -21,7 +20,6 @@ Cx4Debugger::Cx4Debugger(Debugger* debugger)
 {
 	_debugger = debugger;
 	_codeDataLogger = debugger->GetCodeDataLogger(CpuType::Cpu).get();
-	_traceLogger = debugger->GetTraceLogger().get();
 	_disassembler = debugger->GetDisassembler().get();
 	_memoryAccessCounter = debugger->GetMemoryAccessCounter().get();
 	_cx4 = debugger->GetConsole()->GetCartridge()->GetCx4();
@@ -51,16 +49,8 @@ void Cx4Debugger::ProcessRead(uint32_t addr, uint8_t value, MemoryOperationType 
 			_codeDataLogger->SetFlags(addressInfo.Address + 1, CdlFlags::Code | CdlFlags::Cx4);
 		}
 
-		if(_traceLogger->IsCpuLogged(CpuType::Cx4) || _settings->CheckDebuggerFlag(DebuggerFlags::Cx4DebuggerEnabled)) {
+		if(_settings->CheckDebuggerFlag(DebuggerFlags::Cx4DebuggerEnabled)) {
 			_disassembler->BuildCache(addressInfo, 0, CpuType::Cx4);
-
-			if(_traceLogger->IsCpuLogged(CpuType::Cx4)) {
-				DebugState debugState;
-				_debugger->GetState(debugState, true);
-
-				DisassemblyInfo disInfo = _disassembler->GetDisassemblyInfo(addressInfo, addr, 0, CpuType::Cx4);
-				_traceLogger->Log(CpuType::Cx4, debugState, disInfo);
-			}
 		}
 
 		_prevProgramCounter = addr;

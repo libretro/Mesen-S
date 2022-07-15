@@ -5,7 +5,6 @@
 
 class Disassembler;
 class Debugger;
-class TraceLogger;
 class NecDsp;
 class CallstackManager;
 class MemoryAccessCounter;
@@ -17,7 +16,6 @@ class NecDspDebugger final : public IDebugger
 {
 	Debugger* _debugger;
 	Disassembler* _disassembler;
-	TraceLogger* _traceLogger;
 	NecDsp* _dsp;
 	EmuSettings* _settings;
 

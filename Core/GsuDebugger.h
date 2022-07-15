@@ -5,7 +5,6 @@
 
 class Disassembler;
 class Debugger;
-class TraceLogger;
 class CodeDataLogger;
 class Gsu;
 class MemoryAccessCounter;
@@ -17,7 +16,6 @@ class GsuDebugger final : public IDebugger
 {
 	Debugger* _debugger;
 	Disassembler* _disassembler;
-	TraceLogger* _traceLogger;
 	CodeDataLogger* _codeDataLogger;
 	MemoryAccessCounter* _memoryAccessCounter;
 	MemoryManager* _memoryManager;

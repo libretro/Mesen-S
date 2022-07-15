@@ -16,7 +16,6 @@ class InternalRegisters;
 class DmaController;
 class EmuSettings;
 
-class TraceLogger;
 class ExpressionEvaluator;
 class MemoryDumper;
 class MemoryAccessCounter;
@@ -65,7 +64,6 @@ private:
 	unique_ptr<GbDebugger> _gbDebugger;
 
 	shared_ptr<ScriptManager> _scriptManager;
-	shared_ptr<TraceLogger> _traceLogger;
 	shared_ptr<MemoryDumper> _memoryDumper;
 	shared_ptr<MemoryAccessCounter> _memoryAccessCounter;
 	shared_ptr<CodeDataLogger> _codeDataLogger;
@@ -140,7 +138,6 @@ public:
 	void Log(string message);
 	string GetLog();
 
-	shared_ptr<TraceLogger> GetTraceLogger();
 	shared_ptr<MemoryDumper> GetMemoryDumper();
 	shared_ptr<MemoryAccessCounter> GetMemoryAccessCounter();
 	shared_ptr<CodeDataLogger> GetCodeDataLogger(CpuType cpuType);

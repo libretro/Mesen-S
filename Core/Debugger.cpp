@@ -24,7 +24,6 @@
 #include "NotificationManager.h"
 #include "CpuTypes.h"
 #include "DisassemblyInfo.h"
-#include "TraceLogger.h"
 #include "MemoryDumper.h"
 #include "MemoryAccessCounter.h"
 #include "CodeDataLogger.h"
@@ -73,7 +72,6 @@ Debugger::Debugger(shared_ptr<Console> console)
 	_codeDataLogger.reset(new CodeDataLogger(_cart->DebugGetPrgRomSize(), CpuType::Cpu));
 	_memoryDumper.reset(new MemoryDumper(this));
 	_disassembler.reset(new Disassembler(console, _codeDataLogger, this));
-	_traceLogger.reset(new TraceLogger(this, _console));
 	_memoryAccessCounter.reset(new MemoryAccessCounter(this, console.get()));
 	_scriptManager.reset(new ScriptManager(this));
 
@@ -226,11 +224,8 @@ void Debugger::ProcessPpuCycle()
 	switch(cpuType) {
 		case CpuType::Cpu: 
 			//Catch up SPC/DSP as needed (if we're tracing or debugging those particular CPUs)
-			if(_traceLogger->IsCpuLogged(CpuType::Spc) || _settings->CheckDebuggerFlag(DebuggerFlags::SpcDebuggerEnabled)) {
+			if(_settings->CheckDebuggerFlag(DebuggerFlags::SpcDebuggerEnabled))
 				_spc->Run();
-			} else if(_traceLogger->IsCpuLogged(CpuType::NecDsp)) {
-				_cart->RunCoprocessors();
-			}
 
 			_cpuDebugger->ProcessPpuCycle(scanline, cycle);
 			break;
@@ -670,11 +665,6 @@ string Debugger::GetLog()
 		ss << msg << "\n";
 	}
 	return ss.str();
-}
-
-shared_ptr<TraceLogger> Debugger::GetTraceLogger()
-{
-	return _traceLogger;
 }
 
 shared_ptr<MemoryDumper> Debugger::GetMemoryDumper()
