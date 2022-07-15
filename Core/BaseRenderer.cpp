@@ -72,9 +72,3 @@ std::wstring BaseRenderer::WrapText(string utf8Text, float maxLineWidth, uint32_
 
 	return wrappedText;
 }
-
-void BaseRenderer::DrawString(std::string message, int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t opacity)
-{
-	std::wstring textStr = utf8::utf8::decode(message);
-	DrawString(textStr, x, y, r, g, b, opacity);
-}

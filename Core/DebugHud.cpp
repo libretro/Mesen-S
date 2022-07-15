@@ -56,19 +56,3 @@ void DebugHud::DrawRectangle(int x, int y, int width, int height, int color, boo
 		_commands.push_back(unique_ptr<DrawRectangleCommand>(new DrawRectangleCommand(x, y, width, height, color, fill, frameCount, startFrame)));
 	}
 }
-
-void DebugHud::DrawScreenBuffer(uint32_t* screenBuffer, int startFrame)
-{
-	auto lock = _commandLock.AcquireSafe();
-	if(_commands.size() < DebugHud::MaxCommandCount) {
-		_commands.push_back(unique_ptr<DrawScreenBufferCommand>(new DrawScreenBufferCommand(screenBuffer, startFrame)));
-	}
-}
-
-void DebugHud::DrawString(int x, int y, string text, int color, int backColor, int frameCount, int startFrame)
-{
-	auto lock = _commandLock.AcquireSafe();
-	if(_commands.size() < DebugHud::MaxCommandCount) {
-		_commands.push_back(unique_ptr<DrawStringCommand>(new DrawStringCommand(x, y, text, color, backColor, frameCount, startFrame)));
-	}
-}
