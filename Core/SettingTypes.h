@@ -102,12 +102,6 @@ struct VideoConfig
 	uint32_t OverscanRight = 0;
 	uint32_t OverscanTop = 0;
 	uint32_t OverscanBottom = 0;
-
-	bool FullscreenForceIntegerScale = false;
-	bool UseExclusiveFullscreen = false;
-	uint32_t ExclusiveFullscreenRefreshRate = 60;
-	uint32_t FullscreenResWidth = 0;
-	uint32_t FullscreenResHeight = 0;
 };
 
 struct AudioConfig
@@ -188,17 +182,6 @@ struct KeyMapping
 	{
 		if(A || B || X || Y || L || R || Up || Down || Left || Right || Start || Select || TurboA || TurboB || TurboX || TurboY || TurboL || TurboR || TurboStart || TurboSelect) {
 			return true;
-		}
-		return false;
-	}
-
-private:
-	bool HasKeyBinding(uint32_t* buttons, uint32_t count)
-	{
-		for(uint32_t i = 0; i < count; i++) {
-			if(buttons[i] != 0) {
-				return true;
-			}
 		}
 		return false;
 	}
@@ -329,14 +312,8 @@ struct GameboyConfig
 
 struct PreferencesConfig
 {
-	bool ShowFps = false;
-	bool ShowFrameCounter = false;
-	bool ShowGameTimer = false;
-	bool ShowDebugInfo = false;
 	bool DisableOsd = false;
 	bool AllowBackgroundInput = false;
-	bool PauseOnMovieEnd = false;
-	bool DisableGameSelectionScreen = false;
 
 	uint32_t RewindBufferSize = 30;
 

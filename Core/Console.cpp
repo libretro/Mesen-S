@@ -19,7 +19,6 @@
 #include "VideoDecoder.h"
 #include "VideoRenderer.h"
 #include "DebugHud.h"
-#include "FrameLimiter.h"
 #include "MessageManager.h"
 #include "KeyManager.h"
 #include "EventType.h"

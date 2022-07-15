@@ -29,7 +29,6 @@ class BatteryManager;
 class CheatManager;
 class MovieManager;
 class SpcHud;
-class FrameLimiter;
 class Msu1;
 
 enum class MemoryOperationType;

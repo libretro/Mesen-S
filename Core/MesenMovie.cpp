@@ -34,10 +34,6 @@ void MesenMovie::Stop()
 			MessageManager::DisplayMessage("Movies", "MovieEnded");
 		}
 
-		if(_console->GetSettings()->GetPreferences().PauseOnMovieEnd) {
-			_console->Pause();
-		}
-
 		_console->GetCheatManager()->SetCheats(_originalCheats);
 
 		_playing = false;
