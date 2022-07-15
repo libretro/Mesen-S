@@ -102,19 +102,3 @@ void Profiler::InternalReset()
 	_functions[ResetFunctionIndex] = ProfiledFunction();
 	_functions[ResetFunctionIndex].Address = { ResetFunctionIndex, SnesMemoryType::Register };
 }
-
-void Profiler::GetProfilerData(ProfiledFunction* profilerData, uint32_t& functionCount)
-{
-	
-	UpdateCycles();
-
-	functionCount = 0;
-	for(auto func : _functions) {
-		profilerData[functionCount] = func.second;
-		functionCount++;
-
-		if(functionCount >= 100000) {
-			break;
-		}
-	}
-}

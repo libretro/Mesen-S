@@ -22,7 +22,6 @@ private:
 	uint16_t* _eventViewerBuffers[2] = {};
 	uint16_t* _currentEventViewerBuffer = nullptr;
 	EvtColor _evtColor = EvtColor::HBlank;
-	int16_t _prevDrawnPixels = 0;
 
 	uint8_t* _vram = nullptr;
 	uint8_t* _oam = nullptr;

@@ -42,5 +42,4 @@ public:
 	void UnstackFunction();
 
 	void Reset();
-	void GetProfilerData(ProfiledFunction* profilerData, uint32_t& functionCount);
 };

@@ -15,8 +15,6 @@
 #include "../Utilities/HexUtilities.h"
 #include "../Utilities/Serializer.h"
 
-constexpr uint16_t evtColors[6] = { 0x18C6, 0x294A, 0x108C, 0x4210, 0x3084, 0x1184 };
-
 void GbPpu::Init(Console* console, Gameboy* gameboy, GbMemoryManager* memoryManager, GbDmaController* dmaController, uint8_t* vram, uint8_t* oam)
 {
 	_console = console;

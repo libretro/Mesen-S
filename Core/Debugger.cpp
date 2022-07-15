@@ -384,7 +384,6 @@ void Debugger::Run()
 
 void Debugger::Step(CpuType cpuType, int32_t stepCount, StepType type)
 {
-	StepRequest step;
 	IDebugger *debugger = nullptr;
 
 	switch(cpuType) {

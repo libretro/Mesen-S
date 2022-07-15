@@ -32,7 +32,7 @@ uint8 Dsp1::getSr()
 
 uint8 Dsp1::getDr()
 {
-   uint8 oDr;
+   uint8 oDr = 0;
 
    fsmStep(true, oDr);
    return oDr;
@@ -262,7 +262,6 @@ const Dsp1::Command Dsp1::mCommandTable[0x40] = {
 
 void Dsp1::memoryTest(int16 *input, int16 *output)
 {
-   int16& Size = input[0];
    int16& Result = output[0];
 
    Result = 0x0000;
