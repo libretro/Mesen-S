@@ -79,7 +79,7 @@ else ifeq ($(platform), linux-portable)
 
 # (armv7 a7, hard point, neon based) ### 
 # NESC, SNESC, C64 mini 
-else ifeq ($(platform), classic_armv7_a7)
+else ifeq ($(platform),$(filter $(platform),classic_armv7_a7 unix-armv7-hardfloat-neon))
 	TARGET := $(TARGET_NAME)_libretro.so
 	fpic := -fPIC -pthread
 	SHARED := -shared -Wl,--version-script=$(LIBRETRO_DIR)/link.T -Wl,--no-undefined
