@@ -150,9 +150,11 @@ endif
 ifeq ($(platform),$(filter $(platform),ios9 ios-arm64))
 CC     += -miphoneos-version-min=9.0
 CXXFLAGS += -miphoneos-version-min=9.0
+LDFLAGS += -miphoneos-version-min=9.0
 else
 CC     += -miphoneos-version-min=9.0
 CXXFLAGS += -miphoneos-version-min=9.0
+LDFLAGS += -miphoneos-version-min=9.0
 endif
 
 else ifeq ($(platform), tvos-arm64)
@@ -166,6 +168,9 @@ ifeq ($(IOSSDK),)
 endif
    CC  = cc -arch arm64  -isysroot $(IOSSDK)
    CXX = c++ -arch arm64 -isysroot $(IOSSDK)
+   CC     += -mappletvos-version-min=11.0
+   CXXFLAGS += -mappletvos-version-min=11.0
+   LDFLAGS += -mappletvos-version-min=11.0
 else ifneq (,$(findstring qnx,$(platform)))
   TARGET := $(TARGET_NAME)_libretro_qnx.so
    fpic := -fPIC
